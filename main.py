@@ -35,6 +35,8 @@ class Zenex:
                 auth=(f'{self.zd_user_email}/token', self.zd_token),
                 params={
                     'query': query_params,
+                    'sort_by': 'created_at',
+                    'sort_order': 'desc',
                     'page': 1
                 }
             )
@@ -76,12 +78,16 @@ class Zenex:
 
     def get_exportable_tickets(self, query_params: str):
         # https://developer.zendesk.com/api-reference/ticketing/ticket-management/search/#export-search-results
+        # "This endpoint is for search queries that will return more than 1000 results. The result set is ordered only by the created_at attribute."
 
         try:
             res = requests.get(
                 f'{self.get_url()}/api/v2/search/export',
                 auth=(f'{self.zd_user_email}/token', self.zd_token),
-                params={'query': query_params, 'filter[type]': 'ticket'}
+                params={
+                    'query': query_params,
+                    'filter[type]': 'ticket'
+                }
             )
 
             # still limited to 100 result items
@@ -131,13 +137,13 @@ def main():
         zd_token=zd_token
     )
 
-    searchable = zd.search_tickets('type:ticket status:closed')
-    with open('searchable.json', 'w') as file:
-        file.write(json.dumps(searchable))
+    # searchable = zd.search_tickets('type:ticket status:closed')
+    # with open('searchable.json', 'w') as file:
+    #     file.write(json.dumps(searchable))
 
-    # exportable = zd.get_exportable_tickets('status:closed')
-    # with open('exportable.json', 'w') as file:
-    #     file.write(json.dumps(exportable))
+    exportable = zd.get_exportable_tickets('status:closed')
+    with open('exportable.json', 'w') as file:
+        file.write(json.dumps(exportable))
 
 
 if __name__ == '__main__':
