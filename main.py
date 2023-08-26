@@ -14,7 +14,7 @@ class Zenex:
 
         # init logging
         logging.basicConfig(
-            format='%(asctime)s-%(levelname)s: %(message)s',
+            format='ZENEX - %(asctime)s - %(levelname)s: %(message)s',
             level=logging.INFO
         )
 
@@ -28,7 +28,10 @@ class Zenex:
             res = requests.get(
                 f'{self.get_url()}/api/v2/search.json',
                 auth=(f'{self.zd_user_email}/token', self.zd_token),
-                params={'query': query_params}
+                params={
+                    'query': query_params,
+                    'page': 1
+                }
             )
 
             match res.status_code:
@@ -37,7 +40,7 @@ class Zenex:
                     list_of_tickets = payload.get('results')
 
                     logging.info(
-                        f'counted {len(list_of_tickets)} tickets in current page'
+                        f'{len(list_of_tickets)} tickets in the current page from the "results" object'
                     )
                     logging.info(f"count: {payload.get('count')}")
                     logging.info(f"facets: {payload.get('facets')}")
@@ -46,14 +49,16 @@ class Zenex:
                         f"previous_page: {payload.get('previous_page')}"
                     )
 
-                    return list(list_of_tickets)
+                    return payload
 
                 case _:
                     logging.error(f'http {res.status_code}')
                     logging.error(res.text)
+                    exit()
 
         except Exception as e:
             logging.exception(e)
+            exit()
 
 
 def main():
