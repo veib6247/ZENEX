@@ -11,12 +11,16 @@ class Zenex:
         self.domain = domain
         self.zd_user_email = zd_user_email
         self.zd_token = zd_token
+        self.enable_logging = True
 
         # init logging
         logging.basicConfig(
             format='ZENEX - %(asctime)s - %(levelname)s: %(message)s',
             level=logging.INFO
         )
+
+    def config(self, enable_logging: bool):
+        self.enable_logging = enable_logging
 
     def get_url(self):
         return f'https://{self.subdomain}.{self.domain}'
@@ -34,27 +38,32 @@ class Zenex:
                 }
             )
 
+            # Zendesk limit results to only 100 item per request, pagination required to get everything
             match res.status_code:
                 case 200:
                     payload = dict(res.json())
                     list_of_tickets = payload.get('results')
 
-                    logging.info(
-                        f'{len(list_of_tickets)} tickets in the current page from the "results" object'
-                    )
-                    logging.info(f"count: {payload.get('count')}")
-                    logging.info(f"facets: {payload.get('facets')}")
-                    logging.info(f"next_page: {payload.get('next_page')}")
-                    logging.info(
-                        f"previous_page: {payload.get('previous_page')}"
-                    )
+                    if self.enable_logging:
+                        logging.info(
+                            f'{len(list_of_tickets)} tickets in the current page from the "results" object'
+                        )
+                        logging.info(f"count: {payload.get('count')}")
+                        logging.info(f"facets: {payload.get('facets')}")
+                        logging.info(f"next_page: {payload.get('next_page')}")
+                        logging.info(
+                            f"previous_page: {payload.get('previous_page')}"
+                        )
 
                     return payload
 
                 case _:
-                    logging.error(f'http {res.status_code}')
-                    logging.error(res.text)
-                    exit()
+                    if self.enable_logging:
+                        logging.error(f'HTTP {res.status_code} - {res.reason}')
+                        logging.error(res.text)
+
+                    else:
+                        return res.text
 
         except Exception as e:
             logging.exception(e)
@@ -75,7 +84,7 @@ def main():
         zd_token=zd_token
     )
 
-    zd.search_tickets(query_params)
+    tickets = zd.search_tickets(query_params)
 
 
 if __name__ == '__main__':
