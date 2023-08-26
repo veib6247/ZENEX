@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 
@@ -38,21 +39,25 @@ class Zenex:
                 }
             )
 
-            # Zendesk limit results to only 100 item per request, pagination required to get everything
+            # Zendesk limits the result to only 100 item per request, pagination required to get everything
             match res.status_code:
                 case 200:
                     payload = dict(res.json())
-                    list_of_tickets = payload.get('results')
 
                     if self.enable_logging:
+                        list_of_tickets = payload.get('results')
+                        page_ticket_count = len(list_of_tickets)
+                        count = payload.get('count')
+                        facets = payload.get('facets')
+                        next_page = payload.get('next_page')
+                        previous_page = payload.get('previous_page')
+
+                        logging.info(f"count: {count}")
+                        logging.info(f"facets: {facets}")
+                        logging.info(f"next_page: {next_page}")
+                        logging.info(f"previous_page: {previous_page}")
                         logging.info(
-                            f'{len(list_of_tickets)} tickets in the current page from the "results" object'
-                        )
-                        logging.info(f"count: {payload.get('count')}")
-                        logging.info(f"facets: {payload.get('facets')}")
-                        logging.info(f"next_page: {payload.get('next_page')}")
-                        logging.info(
-                            f"previous_page: {payload.get('previous_page')}"
+                            f'{page_ticket_count} tickets in the current page from the "results" object'
                         )
 
                     return payload
@@ -63,7 +68,51 @@ class Zenex:
                         logging.error(res.text)
 
                     else:
-                        return res.text
+                        return {'error': res.text}
+
+        except Exception as e:
+            logging.exception(e)
+            exit()
+
+    def get_exportable_tickets(self, query_params: str):
+        # https://developer.zendesk.com/api-reference/ticketing/ticket-management/search/#export-search-results
+
+        try:
+            res = requests.get(
+                f'{self.get_url()}/api/v2/search/export',
+                auth=(f'{self.zd_user_email}/token', self.zd_token),
+                params={'query': query_params, 'filter[type]': 'ticket'}
+            )
+
+            # still limited to 100 result items
+            match res.status_code:
+                case 200:
+                    payload = dict(res.json())
+
+                    if self.enable_logging:
+                        list_of_tickets = payload.get('results')
+                        page_ticket_count = len(list_of_tickets)
+
+                        facets = payload.get('facets')
+                        meta = payload.get('meta')
+                        links = payload.get('links')
+
+                        logging.info(f"facets: {facets}")
+                        logging.info(f"meta: {json.dumps(meta,indent=4)}")
+                        logging.info(f"links: {json.dumps(links,indent=4)}")
+                        logging.info(
+                            f'{page_ticket_count} tickets in the current page from the "results" object'
+                        )
+
+                    return payload
+
+                case _:
+                    if self.enable_logging:
+                        logging.error(f'HTTP {res.status_code} - {res.reason}')
+                        logging.error(res.text)
+
+                    else:
+                        return {'error': res.text}
 
         except Exception as e:
             logging.exception(e)
@@ -75,8 +124,6 @@ def main():
     zd_user_email = os.getenv('ZD_EMAIL')
     zd_token = os.getenv('ZD_TOKEN')
 
-    query_params = 'type:ticket status:open'
-
     zd = Zenex(
         domain='zendesk.com',
         subdomain='payretosupport',
@@ -84,7 +131,13 @@ def main():
         zd_token=zd_token
     )
 
-    tickets = zd.search_tickets(query_params)
+    searchable = zd.search_tickets('type:ticket status:closed')
+    with open('searchable.json', 'w') as file:
+        file.write(json.dumps(searchable))
+
+    # exportable = zd.get_exportable_tickets('status:closed')
+    # with open('exportable.json', 'w') as file:
+    #     file.write(json.dumps(exportable))
 
 
 if __name__ == '__main__':
