@@ -47,17 +47,13 @@ class Zenex:
                     payload = dict(res.json())
 
                     if self.enable_logging:
-                        list_of_tickets = payload.get('results')
+                        payload_copy = payload.copy()
+                        list_of_tickets = payload_copy.get('results')
                         page_ticket_count = len(list_of_tickets)
-                        count = payload.get('count')
-                        facets = payload.get('facets')
-                        next_page = payload.get('next_page')
-                        previous_page = payload.get('previous_page')
 
-                        logging.info(f"count: {count}")
-                        logging.info(f"facets: {facets}")
-                        logging.info(f"next_page: {next_page}")
-                        logging.info(f"previous_page: {previous_page}")
+                        del payload_copy['results']
+                        logging.info(json.dumps(payload_copy, indent=4))
+
                         logging.info(
                             f'{page_ticket_count} tickets in the current page from the "results" object'
                         )
@@ -96,16 +92,15 @@ class Zenex:
                     payload = dict(res.json())
 
                     if self.enable_logging:
-                        list_of_tickets = payload.get('results')
+                        payload_copy = payload.copy()
+
+                        list_of_tickets = payload_copy.get('results')
                         page_ticket_count = len(list_of_tickets)
 
-                        facets = payload.get('facets')
-                        meta = payload.get('meta')
-                        links = payload.get('links')
+                        # remove the results object when logging to not flood the terminal
+                        del payload_copy['results']
+                        logging.info(json.dumps(payload_copy, indent=4))
 
-                        logging.info(f"facets: {facets}")
-                        logging.info(f"meta: {json.dumps(meta,indent=4)}")
-                        logging.info(f"links: {json.dumps(links,indent=4)}")
                         logging.info(
                             f'{page_ticket_count} tickets in the current page from the "results" object'
                         )
@@ -137,9 +132,9 @@ def main():
         zd_token=zd_token
     )
 
-    # searchable = zd.search_tickets('type:ticket status:closed')
-    # with open('searchable.json', 'w') as file:
-    #     file.write(json.dumps(searchable))
+    searchable = zd.search_tickets('type:ticket status:closed')
+    with open('searchable.json', 'w') as file:
+        file.write(json.dumps(searchable))
 
     exportable = zd.get_exportable_tickets('status:closed')
     with open('exportable.json', 'w') as file:
