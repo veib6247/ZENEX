@@ -133,11 +133,11 @@ def main():
     )
 
     searchable = zd.search_tickets('type:ticket status:closed')
-    with open('searchable.json', 'w') as file:
+    with open('data/searchable.json', 'w') as file:
         file.write(json.dumps(searchable))
 
     exportable = zd.get_exportable_tickets('status:closed')
-    with open('exportable.json', 'w') as file:
+    with open('data/exportable.json', 'w') as file:
         file.write(json.dumps(exportable))
 
 
