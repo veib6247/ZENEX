@@ -119,6 +119,161 @@ class Zenex:
             logging.exception(e)
             exit()
 
+    def show_user(self, user_id: str):
+        # https://developer.zendesk.com/api-reference/ticketing/users/users/#show-user
+
+        try:
+            res = requests.get(
+                f'{self.get_url()}/api/v2/users/{user_id}.json',
+                auth=(f'{self.zd_user_email}/token', self.zd_token)
+            )
+
+            match res.status_code:
+                case 200:
+                    payload = dict(res.json())
+
+                    if self.enable_logging:
+                        logging.info(json.dumps(payload, indent=4))
+
+                    else:
+                        return payload
+
+                case _:
+                    if self.enable_logging:
+                        logging.error(f'HTTP {res.status_code} - {res.reason}')
+                        logging.error(res.text)
+
+                    else:
+                        return {'error': res.text}
+
+        except Exception as e:
+            logging.exception(e)
+            exit()
+
+    def show_field(self, ticket_field_id: str):
+        # https://developer.zendesk.com/api-reference/ticketing/tickets/ticket_fields/#show-ticket-field
+
+        try:
+            res = requests.get(
+                f'{self.get_url()}/api/v2/ticket_fields/{ticket_field_id}.json',
+                auth=(f'{self.zd_user_email}/token', self.zd_token)
+            )
+
+            match res.status_code:
+                case 200:
+                    payload = dict(res.json())
+
+                    if self.enable_logging:
+                        logging.info(json.dumps(payload, indent=4))
+
+                    else:
+                        return payload
+
+                case _:
+                    if self.enable_logging:
+                        logging.error(f'HTTP {res.status_code} - {res.reason}')
+                        logging.error(res.text)
+
+                    else:
+                        return {'error': res.text}
+
+        except Exception as e:
+            logging.exception(e)
+            exit()
+
+    def show_brand(self, brand_id: str):
+        # https://developer.zendesk.com/api-reference/ticketing/account-configuration/brands/#show-a-brand
+
+        try:
+            res = requests.get(
+                f'{self.get_url()}/api/v2/brands/{brand_id}.json',
+                auth=(f'{self.zd_user_email}/token', self.zd_token)
+            )
+
+            match res.status_code:
+                case 200:
+                    payload = dict(res.json())
+
+                    if self.enable_logging:
+                        logging.info(json.dumps(payload, indent=4))
+
+                    else:
+                        return payload
+
+                case _:
+                    if self.enable_logging:
+                        logging.error(f'HTTP {res.status_code} - {res.reason}')
+                        logging.error(res.text)
+
+                    else:
+                        return {'error': res.text}
+
+        except Exception as e:
+            logging.exception(e)
+            exit()
+
+    def show_organization(self, organization_id):
+        # https://developer.zendesk.com/api-reference/ticketing/organizations/organizations/#show-organization
+
+        try:
+            res = requests.get(
+                f'{self.get_url()}/api/v2/organizations/{organization_id}.json',
+                auth=(f'{self.zd_user_email}/token', self.zd_token)
+            )
+
+            match res.status_code:
+                case 200:
+                    payload = dict(res.json())
+
+                    if self.enable_logging:
+                        logging.info(json.dumps(payload, indent=4))
+
+                    else:
+                        return payload
+
+                case _:
+                    if self.enable_logging:
+                        logging.error(f'HTTP {res.status_code} - {res.reason}')
+                        logging.error(res.text)
+
+                    else:
+                        return {'error': res.text}
+
+        except Exception as e:
+            logging.exception(e)
+            exit()
+
+    def show_group(self, group_id):
+        # https://developer.zendesk.com/api-reference/ticketing/groups/groups/#show-group
+
+        try:
+            res = requests.get(
+                f'{self.get_url()}/api/v2/groups/{group_id}.json',
+                auth=(f'{self.zd_user_email}/token', self.zd_token)
+            )
+
+            match res.status_code:
+                case 200:
+                    payload = dict(res.json())
+
+                    if self.enable_logging:
+                        logging.info(json.dumps(payload, indent=4))
+
+                    else:
+                        return payload
+
+                case _:
+                    if self.enable_logging:
+                        logging.error(f'HTTP {res.status_code} - {res.reason}')
+                        logging.error(res.text)
+
+                    else:
+                        return {'error': res.text}
+
+        except Exception as e:
+            logging.exception(e)
+            exit()
+
 
 def main():
     load_dotenv()
@@ -132,13 +287,19 @@ def main():
         zd_token=zd_token
     )
 
-    searchable = zd.search_tickets('type:ticket status:closed')
-    with open('data/searchable.json', 'w') as file:
-        file.write(json.dumps(searchable))
+    # searchable = zd.search_tickets('type:ticket status:closed')
+    # with open('data/searchable.json', 'w') as file:
+    #     file.write(json.dumps(searchable))
 
-    exportable = zd.get_exportable_tickets('status:closed')
-    with open('data/exportable.json', 'w') as file:
-        file.write(json.dumps(exportable))
+    # exportable = zd.get_exportable_tickets('status:closed')
+    # with open('data/exportable.json', 'w') as file:
+    #     file.write(json.dumps(exportable))
+
+    # zd.show_user('901178672543')
+    # zd.show_field('16862464937369')
+    # zd.show_brand('900000066203')
+    # zd.show_organization('900001325246')
+    zd.show_group('900000372563')
 
 
 if __name__ == '__main__':
