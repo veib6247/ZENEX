@@ -20,7 +20,7 @@ class Zenex:
             level=logging.INFO
         )
 
-    def config(self, enable_logging: bool):
+    def config(self, enable_logging: bool) -> None:
         self.enable_logging = enable_logging
 
     def get_url(self):
@@ -45,7 +45,6 @@ class Zenex:
                 }
             )
 
-            # Zendesk limits the result to only 100 item per request, pagination required to get everything
             match res.status_code:
                 case 200:
                     payload = dict(res.json())
@@ -95,7 +94,6 @@ class Zenex:
                 }
             )
 
-            # still limited to 100 result items
             match res.status_code:
                 case 200:
                     payload = dict(res.json())
