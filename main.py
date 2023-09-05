@@ -27,11 +27,11 @@ class Zenex:
         return f'https://{self.subdomain}.{self.domain}'
 
     def search_tickets(self, query_params: str):
-        '''
+        """
         Returns the 1st page of the query.
 
         https://developer.zendesk.com/api-reference/ticketing/ticket-management/search
-        '''
+        """
 
         try:
             res = requests.get(
@@ -76,13 +76,14 @@ class Zenex:
             exit()
 
     def get_exportable_tickets(self, query_params: str):
-        '''
+        """
         Return 1st page of the query using the export endpoint.
 
-        "This endpoint is for search queries that will return more than 1000 results. The result set is ordered only by the created_at attribute."
+        "This endpoint is for search queries that will return more than 1000 results. The result set is ordered only by
+        the created_at attribute."
 
         https://developer.zendesk.com/api-reference/ticketing/ticket-management/search/#export-search-results
-        '''
+        """
 
         try:
             res = requests.get(
@@ -126,12 +127,12 @@ class Zenex:
             logging.exception(e)
             exit()
 
-    def get_id_context(self, resource: str, id: str):
-        '''Take in a resource and the ID. Valid resources are users, ticket_fields, brands, organizations, groups.'''
+    def get_id_context(self, resource: str, context_id: str):
+        """Take in a resource and the ID. Valid resources are users, ticket_fields, brands, organizations, groups."""
 
         try:
             res = requests.get(
-                f'{self.get_url()}/api/v2/{resource}/{id}.json',
+                f'{self.get_url()}/api/v2/{resource}/{context_id}.json',
                 auth=(f'{self.zd_user_email}/token', self.zd_token)
             )
 
@@ -179,10 +180,10 @@ def main():
     # with open('downloads/exportable.json', 'w') as file:
     #     file.write(json.dumps(exportable))
 
-    zd.get_id_context(resource='users', id='900120880703')
-    zd.get_id_context(resource='ticket_fields', id='16862464937369')
-    zd.get_id_context(resource='brands', id='900000066203')
-    zd.get_id_context(resource='organizations', id='900001325246')
+    zd.get_id_context(resource='users', context_id='900120880703')
+    zd.get_id_context(resource='ticket_fields', context_id='16862464937369')
+    zd.get_id_context(resource='brands', context_id='900000066203')
+    zd.get_id_context(resource='organizations', context_id='900001325246')
 
 
 if __name__ == '__main__':
