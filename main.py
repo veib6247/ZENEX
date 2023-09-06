@@ -26,6 +26,40 @@ class Zenex:
     def get_url(self):
         return f'https://{self.subdomain}.{self.domain}'
 
+    def list_tickets(self):
+        """Just list your tickets bruh.."""
+
+        try:
+            res = requests.get(
+                f'{self.get_url()}/api/v2/tickets',
+                auth=(f'{self.zd_user_email}/token', self.zd_token),
+                params={
+                    'sort_by': 'created_at',
+                    'sort_order': 'desc'
+                }
+            )
+
+            match res.status_code:
+                case 200:
+                    payload = dict(res.json())
+
+                    if self.enable_logging:
+                        logging.info(json.dumps(payload, indent=4))
+
+                    return payload
+
+                case _:
+                    if self.enable_logging:
+                        logging.error(f'HTTP {res.status_code} - {res.reason}')
+                        logging.error(res.text)
+
+                    else:
+                        return {'error': res.text}
+
+        except Exception as e:
+            logging.exception(e)
+            exit()
+
     def search_tickets(self, query_params: str):
         """
         Returns the 1st page of the query.
@@ -180,10 +214,15 @@ def main():
     # with open('downloads/exportable.json', 'w') as file:
     #     file.write(json.dumps(exportable))
 
-    zd.get_id_context(resource='users', context_id='900120880703')
-    zd.get_id_context(resource='ticket_fields', context_id='16862464937369')
-    zd.get_id_context(resource='brands', context_id='900000066203')
-    zd.get_id_context(resource='organizations', context_id='900001325246')
+    zd.config(enable_logging=False)
+    ticket_list = zd.list_tickets()
+    with open('downloads/list.json', 'w') as file:
+        file.write(json.dumps(ticket_list))
+
+    # zd.get_id_context(resource='users', context_id='900120880703')
+    # zd.get_id_context(resource='ticket_fields', context_id='16862464937369')
+    # zd.get_id_context(resource='brands', context_id='900000066203')
+    # zd.get_id_context(resource='organizations', context_id='900001325246')
 
 
 if __name__ == '__main__':
