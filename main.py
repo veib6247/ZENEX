@@ -20,8 +20,9 @@ class Zenex:
             level=logging.INFO
         )
 
-    def config(self, enable_logging: bool) -> None:
+    def config(self, enable_logging: bool):
         self.enable_logging = enable_logging
+        return self
 
     def get_url(self):
         return f'https://{self.subdomain}.{self.domain}'
@@ -214,8 +215,8 @@ def main():
     # with open('downloads/exportable.json', 'w') as file:
     #     file.write(json.dumps(exportable))
 
-    zd.config(enable_logging=False)
-    ticket_list = zd.list_tickets()
+    
+    ticket_list = zd.config(enable_logging=False).list_tickets()
     with open('downloads/list.json', 'w') as file:
         file.write(json.dumps(ticket_list))
 
