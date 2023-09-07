@@ -29,11 +29,11 @@ class Zenex:
         return f'https://{self.subdomain}.{self.domain}'
 
     def timer(func):
-        """Used as decorator for internal methods"""
+        """Used as decorator timing internal methods"""
 
         def wrapper(*args, **kwargs):
             start_time = time.time()
-            result = func(*args, **kwargs)
+            result = func(*args, **kwargs)  # sandwich me!
             end_time = time.time()
             logging.info(
                 f'Task finished in {start_time-end_time} seconds'
