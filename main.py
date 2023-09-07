@@ -7,6 +7,24 @@ import requests
 from dotenv import load_dotenv
 
 
+# decorator for your methods
+def timer(func):
+    """Used as decorator for timing internal methods"""
+
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)  # sandwich me!
+        end_time = time.time()
+        logging.info(
+            f'Task finished in {end_time - start_time} seconds'
+        )
+
+        return result
+
+    return wrapper
+
+
+# ze main class
 class Zenex:
     def __init__(self, domain: str, subdomain: str, zd_user_email: str, zd_token: str) -> None:
         self.subdomain = subdomain
@@ -28,24 +46,9 @@ class Zenex:
     def get_url(self):
         return f'https://{self.subdomain}.{self.domain}'
 
-    def timer(func):
-        """Used as decorator for timing internal methods"""
-
-        def wrapper(*args, **kwargs):
-            start_time = time.time()
-            result = func(*args, **kwargs)  # sandwich me!
-            end_time = time.time()
-            logging.info(
-                f'Task finished in {end_time-start_time} seconds'
-            )
-
-            return result
-
-        return wrapper
-
     @timer
     def list_tickets(self):
-        """Just list your tickets bruh.."""
+        """Just list your tickets bruh"""
 
         try:
             res = requests.get(
@@ -235,13 +238,15 @@ def main():
     # with open('downloads/exportable.json', 'w') as file:
     #     file.write(json.dumps(exportable))
 
-    ticket_list = zd.config(enable_logging=False).list_tickets()
-    with open('downloads/list.json', 'w') as file:
-        file.write(json.dumps(ticket_list))
+    # ticket_list = zd.config(enable_logging=False).list_tickets()
+    # with open('downloads/list.json', 'w') as file:
+    #     file.write(json.dumps(ticket_list))
 
-    # results = zd.config(enable_logging=False).get_id_context(
-    #     resource='users', context_id='900120880703')
-    # logging.info(results)
+    results = zd.config(enable_logging=False).get_id_context(
+        resource='users', context_id='900120880703')
+
+    logging.info(results)
+
     # zd.get_id_context(resource='ticket_fields', context_id='16862464937369')
     # zd.get_id_context(resource='brands', context_id='900000066203')
     # zd.get_id_context(resource='organizations', context_id='900001325246')
