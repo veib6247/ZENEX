@@ -29,7 +29,7 @@ class Zenex:
         return f'https://{self.subdomain}.{self.domain}'
 
     def timer(func):
-        """Used as decorator timing internal methods"""
+        """Used as decorator for timing internal methods"""
 
         def wrapper(*args, **kwargs):
             start_time = time.time()
