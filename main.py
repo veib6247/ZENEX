@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import time
 
 import requests
 from dotenv import load_dotenv
@@ -27,6 +28,22 @@ class Zenex:
     def get_url(self):
         return f'https://{self.subdomain}.{self.domain}'
 
+    def timer(func):
+        """Used as decorator for internal methods"""
+
+        def wrapper(*args, **kwargs):
+            start_time = time.time()
+            result = func(*args, **kwargs)
+            end_time = time.time()
+            logging.info(
+                f'Task finished in {start_time-end_time} seconds'
+            )
+
+            return result
+
+        return wrapper
+
+    @timer
     def list_tickets(self):
         """Just list your tickets bruh.."""
 
@@ -61,6 +78,7 @@ class Zenex:
             logging.exception(e)
             exit()
 
+    @timer
     def search_tickets(self, query_params: str):
         """
         Returns the 1st page of the query.
@@ -110,6 +128,7 @@ class Zenex:
             logging.exception(e)
             exit()
 
+    @timer
     def get_exportable_tickets(self, query_params: str):
         """
         Return 1st page of the query using the export endpoint.
@@ -162,6 +181,7 @@ class Zenex:
             logging.exception(e)
             exit()
 
+    @timer
     def get_id_context(self, resource: str, context_id: str):
         """Take in a resource and the ID. Valid resources are users, ticket_fields, brands, organizations, groups."""
 
@@ -207,20 +227,21 @@ def main():
         zd_token=zd_token
     )
 
-    # searchable = zd.search_tickets('type:ticket status:closed')
-    # with open('downloads/searchable.json', 'w') as file:
-    #     file.write(json.dumps(searchable))
+    searchable = zd.search_tickets('type:ticket status:closed')
+    with open('downloads/searchable.json', 'w') as file:
+        file.write(json.dumps(searchable))
 
     # exportable = zd.get_exportable_tickets('status:closed')
     # with open('downloads/exportable.json', 'w') as file:
     #     file.write(json.dumps(exportable))
 
-    
-    ticket_list = zd.config(enable_logging=False).list_tickets()
-    with open('downloads/list.json', 'w') as file:
-        file.write(json.dumps(ticket_list))
+    # ticket_list = zd.config(enable_logging=False).list_tickets()
+    # with open('downloads/list.json', 'w') as file:
+    #     file.write(json.dumps(ticket_list))
 
-    # zd.get_id_context(resource='users', context_id='900120880703')
+    # results = zd.config(enable_logging=False).get_id_context(
+    #     resource='users', context_id='900120880703')
+    # logging.info(results)
     # zd.get_id_context(resource='ticket_fields', context_id='16862464937369')
     # zd.get_id_context(resource='brands', context_id='900000066203')
     # zd.get_id_context(resource='organizations', context_id='900001325246')
