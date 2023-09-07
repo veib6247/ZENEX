@@ -36,7 +36,7 @@ class Zenex:
             result = func(*args, **kwargs)  # sandwich me!
             end_time = time.time()
             logging.info(
-                f'Task finished in {start_time-end_time} seconds'
+                f'Task finished in {end_time-start_time} seconds'
             )
 
             return result
@@ -227,17 +227,17 @@ def main():
         zd_token=zd_token
     )
 
-    searchable = zd.search_tickets('type:ticket status:closed')
-    with open('downloads/searchable.json', 'w') as file:
-        file.write(json.dumps(searchable))
+    # searchable = zd.search_tickets('type:ticket status:closed')
+    # with open('downloads/searchable.json', 'w') as file:
+    #     file.write(json.dumps(searchable))
 
     # exportable = zd.get_exportable_tickets('status:closed')
     # with open('downloads/exportable.json', 'w') as file:
     #     file.write(json.dumps(exportable))
 
-    # ticket_list = zd.config(enable_logging=False).list_tickets()
-    # with open('downloads/list.json', 'w') as file:
-    #     file.write(json.dumps(ticket_list))
+    ticket_list = zd.config(enable_logging=False).list_tickets()
+    with open('downloads/list.json', 'w') as file:
+        file.write(json.dumps(ticket_list))
 
     # results = zd.config(enable_logging=False).get_id_context(
     #     resource='users', context_id='900120880703')
