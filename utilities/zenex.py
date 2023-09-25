@@ -46,7 +46,6 @@ class Zenex:
     @timer
     def list_tickets(self):
         """Just list your tickets bruh"""
-
         try:
             res = requests.get(
                 f'{self.get_url()}/api/v2/tickets',
@@ -81,11 +80,8 @@ class Zenex:
     @timer
     def search_tickets(self, query_params: str, next_page: str):
         """
-        Returns the 1st page of the query.
-
         https://developer.zendesk.com/api-reference/ticketing/ticket-management/search
         """
-
         try:
             if not next_page:
                 res = requests.get(
@@ -136,14 +132,8 @@ class Zenex:
     @timer
     def get_exportable_tickets(self, query_params: str, next_page: str):
         """
-        Return 1st page of the query using the export endpoint.
-
-        "This endpoint is for search queries that will return more than 1000 results. The result set is ordered only by
-        the created_at attribute."
-
         https://developer.zendesk.com/api-reference/ticketing/ticket-management/search/#export-search-results
         """
-
         try:
             if not next_page:
                 res = requests.get(
@@ -197,7 +187,6 @@ class Zenex:
     @timer
     def get_id_context(self, resource: str, context_id: str):
         """Take in a resource and the ID. Valid resources are users, ticket_fields, brands, organizations, groups."""
-
         try:
             res = requests.get(
                 f'{self.get_url()}/api/v2/{resource}/{context_id}.json',
