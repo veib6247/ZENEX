@@ -6,7 +6,7 @@ import requests
 
 
 # decorator for your methods
-def timer(func):
+def _timer(func):
     """Used as decorator for timing internal methods"""
     def wrapper(*args, **kwargs):
         start_time = time.time()
@@ -43,7 +43,7 @@ class Zenex:
     def get_url(self):
         return f'https://{self.subdomain}.{self.domain}'
 
-    @timer
+    @_timer
     def list_tickets(self):
         """Just list your tickets bruh"""
         try:
@@ -77,7 +77,7 @@ class Zenex:
             logging.exception(e)
             exit()
 
-    @timer
+    @_timer
     def search_tickets(self, query_params: str, next_page: str):
         """
         https://developer.zendesk.com/api-reference/ticketing/ticket-management/search
@@ -129,7 +129,7 @@ class Zenex:
             logging.exception(e)
             exit()
 
-    @timer
+    @_timer
     def get_exportable_tickets(self, query_params: str, next_page: str):
         """
         https://developer.zendesk.com/api-reference/ticketing/ticket-management/search/#export-search-results
@@ -184,7 +184,7 @@ class Zenex:
             logging.exception(e)
             exit()
 
-    @timer
+    @_timer
     def get_id_context(self, resource: str, context_id: str):
         """Take in a resource and the ID. Valid resources are users, ticket_fields, brands, organizations, groups."""
         try:
